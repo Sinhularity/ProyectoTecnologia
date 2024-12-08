@@ -1,14 +1,19 @@
-DROP DATABASE IF EXISTS Lyrics;
+-- Solo la primera vez que se genere la BD
+-- DROP DATABASE IF EXISTS lyrics;
+-- WITH (FORCE) -> En caso de que los usuarios estén conectados a la BD
+--
+-- CREATE DATABASE lyrics;
 
-CREATE DATABASE Lyrics;
+\c lyrics; -- Conexión a la base de datos
+SET search_path TO lyrics; -- Cambio de esquema
 
-/* You are now connected to database "Lyrics" */
-\c Lyrics;
+DROP SCHEMA IF EXISTS lyrics;
 
+CREATE SCHEMA lyrics;
 
 /* >-------------------- Tablas ----------------------------<*/
 
-DROP TABLE IF EXISTS Usuario;
+DROP TABLE IF EXISTS Usuario CASCADE;
 
 CREATE TABLE Usuario (
     id_usuario SERIAL NOT NULL
@@ -31,7 +36,7 @@ CREATE TABLE Acceso (
     , PRIMARY KEY (id_acceso)
 );
 
-DROP TABLE IF EXISTS GeneroMusical;
+DROP TABLE IF EXISTS GeneroMusical CASCADE;
 
 CREATE TABLE GeneroMusical (
     id_genero_musical SERIAL NOT NULL
@@ -39,7 +44,7 @@ CREATE TABLE GeneroMusical (
     , PRIMARY KEY (id_genero_musical)
 );
 
-DROP TABLE IF EXISTS Artista;
+DROP TABLE IF EXISTS Artista CASCADE;
 
 CREATE TABLE Artista (
     id_artista SERIAL NOT NULL
@@ -47,7 +52,7 @@ CREATE TABLE Artista (
     , PRIMARY KEY (id_artista)
 );
 
-DROP TABLE IF EXISTS Cancion;
+DROP TABLE IF EXISTS Cancion CASCADE;
 
 CREATE TABLE Cancion (
   id_cancion SERIAL NOT NULL
@@ -108,6 +113,9 @@ ALTER TABLE Biblioteca
 
 
 /* >-------------------- Triggers ----------------------------<*/
+
+DROP FUNCTION IF EXISTS add_usuario CASCADE;
+
 CREATE FUNCTION add_usuario() RETURNS TRIGGER AS $$
     BEGIN
         INSERT INTO Log (
@@ -122,6 +130,8 @@ CREATE FUNCTION add_usuario() RETURNS TRIGGER AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS log_acceso CASCADE;
+
 CREATE FUNCTION log_acceso() RETURNS TRIGGER AS $$
     BEGIN
         INSERT INTO Log(
@@ -129,8 +139,7 @@ CREATE FUNCTION log_acceso() RETURNS TRIGGER AS $$
                        , descripcion_log
         ) VALUES (
                   NOW()
-                  ,'Se ha registrado un nuevo acceso para el usuario '||NEW.nombre_usuario||
-                  'con el correo electrónico'||NEW.correo_electronico_acceso || '.'
+                  ,'Se ha registrado un nuevo acceso para el usuario'||NEW.correo_electronico_acceso||'.'
                 );
         RETURN NEW;
     END;
@@ -139,6 +148,8 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER log_acceso AFTER INSERT ON Acceso
         FOR EACH ROW
         EXECUTE FUNCTION log_acceso();
+
+DROP FUNCTION IF EXISTS add_usuario_y_acceso CASCADE;
 
 CREATE FUNCTION add_usuario_y_acceso() RETURNS TRIGGER AS $$
     BEGIN
@@ -150,3 +161,5 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER add_usuario_y_acceso AFTER INSERT ON Usuario
         FOR EACH ROW
         EXECUTE FUNCTION add_usuario_y_acceso();
+
+\quit
