@@ -7,7 +7,7 @@
 \c lyrics; -- Conexión a la base de datos
 SET search_path TO lyrics; -- Cambio de esquema
 
-DROP SCHEMA IF EXISTS lyrics;
+DROP SCHEMA IF EXISTS lyrics CASCADE;
 
 CREATE SCHEMA lyrics;
 
@@ -19,7 +19,7 @@ CREATE TABLE Usuario (
     id_usuario SERIAL NOT NULL
     , apellido_paterno_usuario VARCHAR(12) NOT NULL
     , apellido_materno_usuario VARCHAR(12) NOT NULL
-    , nombre_usuario VARCHAR(12) NOT NULL
+    , nombre_usuario VARCHAR(20) NOT NULL
     , correo_electronico_usuario VARCHAR(50) NOT NULL
     , telefono_usuario VARCHAR(10) NOT NULL
     , PRIMARY KEY (id_usuario)
@@ -108,6 +108,15 @@ ALTER TABLE Biblioteca
 
 /* >-------------------- Insertar datos ----------------------------<*/
 
+COPY Usuario(
+    apellido_paterno_usuario
+    , apellido_materno_usuario
+    , nombre_usuario
+    , correo_electronico_usuario
+    , telefono_usuario)
+    FROM 'D:\Git Bash\ProyectoTecnologia\Insercciones.txt'
+    WITH
+    (FORMAT CSV, DELIMITER '|');
 
 /* Cómo insertar datos en la Bytea */
 
@@ -162,4 +171,4 @@ CREATE TRIGGER add_usuario_y_acceso AFTER INSERT ON Usuario
         FOR EACH ROW
         EXECUTE FUNCTION add_usuario_y_acceso();
 
-\quit
+-- \quit
