@@ -1,0 +1,21 @@
+SELECT * FROM usuario;
+
+SET search_path TO lyrics; -- Cambio de esquema
+
+--- Checar página para el deshaseo
+--- https://docs.vultr.com/how-to-securely-store-passwords-using-postgresql
+
+
+INSERT INTO acceso
+    (correo_electronico_acceso
+    , contrasena_acceso
+    , ultima_fecha_acceso
+    , fk_id_usuario)
+VALUES (
+    'zS22017021@estudiantes.uv.mx'
+    , '123456'
+    , NOW()
+    , 1
+);
+
+

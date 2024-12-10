@@ -5,7 +5,7 @@
 -- CREATE DATABASE lyrics;
 
 \c lyrics; -- Conexión a la base de datos
-SET search_path TO lyrics; -- Cambio de esquema
+SET search_path TO lyrics; -- Cambio de esquema y para ejecutar consultas
 
 DROP SCHEMA IF EXISTS lyrics CASCADE;
 
@@ -30,8 +30,8 @@ DROP TABLE IF EXISTS Acceso;
 CREATE TABLE Acceso (
     id_acceso SERIAL NOT NULL
     , correo_electronico_acceso VARCHAR(50) NOT NULL
-    , contrasena_acceso VARCHAR(16) NOT NULL
-    , fecha_acceso TIMESTAMP NOT NULL
+    , contrasena_acceso TEXT NOT NULL
+    , ultima_fecha_acceso TIMESTAMP NOT NULL
     , fk_id_usuario INT NOT NULL
     , PRIMARY KEY (id_acceso)
 );
@@ -106,22 +106,7 @@ ALTER TABLE Biblioteca
     ADD CONSTRAINT fk_id_usuario FOREIGN KEY (fk_id_usuario) REFERENCES Usuario (id_usuario)
     , ADD CONSTRAINT fk_id_cancion FOREIGN KEY (fk_id_cancion) REFERENCES Cancion (id_cancion);
 
-/* >-------------------- Insertar datos ----------------------------<*/
-
-COPY Usuario(
-    apellido_paterno_usuario
-    , apellido_materno_usuario
-    , nombre_usuario
-    , correo_electronico_usuario
-    , telefono_usuario)
-    FROM 'D:\Git Bash\ProyectoTecnologia\Insercciones.txt'
-    WITH
-    (FORMAT CSV, DELIMITER '|');
-
-/* Cómo insertar datos en la Bytea */
-
-
-/* >-------------------- Triggers ----------------------------<*/
+/* >-------------------- Funciones Triggers ----------------------------<*/
 
 DROP FUNCTION IF EXISTS add_usuario CASCADE;
 
@@ -132,9 +117,8 @@ CREATE FUNCTION add_usuario() RETURNS TRIGGER AS $$
             , descripcion_log)
         VALUES (
                 NOW()
-               , 'Se ha registrado un nuevo usuario.'||NEW.nombre_usuario||
-                 'con el correo electrónico'||NEW.correo_electronico_usuario || '.'
-               );
+               , 'Se ha registrado un nuevo usuario: '||NEW.nombre_usuario||'.'
+        );
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
@@ -154,21 +138,47 @@ CREATE FUNCTION log_acceso() RETURNS TRIGGER AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER log_acceso AFTER INSERT ON Acceso
+DROP FUNCTION IF EXISTS hash_password CASCADE;
+
+DROP EXTENSION IF EXISTS pgcrypto;
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE FUNCTION hash_password() RETURNS TRIGGER AS $$
+    BEGIN
+        NEW.contrasena_acceso = crypt(NEW.contrasena_acceso, gen_salt('bf'));
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+/* >-------------------- Triggers ----------------------------<*/
+
+CREATE TRIGGER log_acceso AFTER INSERT OR UPDATE ON Acceso  -- Actualizar solo fecha de acceso
         FOR EACH ROW
         EXECUTE FUNCTION log_acceso();
 
-DROP FUNCTION IF EXISTS add_usuario_y_acceso CASCADE;
-
-CREATE FUNCTION add_usuario_y_acceso() RETURNS TRIGGER AS $$
-    BEGIN
-        PERFORM add_usuario();
-        PERFORM log_acceso();
-    END
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER add_usuario_y_acceso AFTER INSERT ON Usuario
+CREATE TRIGGER add_usuario AFTER INSERT ON Usuario
         FOR EACH ROW
-        EXECUTE FUNCTION add_usuario_y_acceso();
+        EXECUTE FUNCTION add_usuario();
 
--- \quit
+CREATE TRIGGER hash_password BEFORE INSERT OR UPDATE ON Acceso
+    FOR EACH ROW
+    EXECUTE FUNCTION hash_password();
+
+/* >-------------------- Insertar datos ----------------------------<*/
+
+COPY Usuario(
+    apellido_paterno_usuario
+    , apellido_materno_usuario
+    , nombre_usuario
+    , correo_electronico_usuario
+    , telefono_usuario)
+    FROM 'D:\Git Bash\ProyectoTecnologia\Insercciones.txt'
+    WITH
+    (FORMAT CSV, DELIMITER '|');
+
+/* Cómo insertar datos en la Bytea */
+
+
+
+\c quit; -- Desconexión de la base de datos
