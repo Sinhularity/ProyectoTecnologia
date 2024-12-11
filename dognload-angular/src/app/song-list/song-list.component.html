@@ -1,14 +1,16 @@
 <h2>Canciones</h2>
 <table class="table table-striped">
     <thead class="table-dark">
-        <tr>
+        <tr>    
             <th>Titulo</th>
+            <th>URL del video</th>
             <th>Link de descarga</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor= "let song of songList">
             <td>{{song.title}}</td>
+            <td><a href="{{song.videoURL}}" target="_blank">URL del video</a></td>
             <td><a href={{song.downloadLink}} target="_blank">Download</a></td>
         </tr>
     </tbody>

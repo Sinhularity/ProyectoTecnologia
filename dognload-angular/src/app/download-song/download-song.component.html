@@ -2,8 +2,10 @@
     <h3 class="text-center"> Generar link de descarga</h3>
     <form (ngSubmit) = "onSubmit()">
         <div class="form-group">
-            <label>URL del video : </label>
-            <input type="text" class="form-control" id="url" [(ngModel)] = "song.title" name="url">
+            <label>Titulo :</label>
+            <input type="text" class="form-control" id="title" [(ngModel)] = "song.title" name="title">
+            <label>URL del video :</label>
+            <input type="text" class="form-control" id="url" [(ngModel)] = "song.videoURL" name="url">
         </div>
 
         <button class="btn btn-success">Descargar</button>

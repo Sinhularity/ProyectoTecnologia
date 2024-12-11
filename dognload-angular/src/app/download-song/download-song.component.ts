@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Song } from '../song';
 import { SongService } from '../song.service';
-import { Router } from 'express';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-download-song',
@@ -21,11 +21,16 @@ export class DownloadSongComponent implements OnInit {
 
   saveSong() {
     this.songService.saveSong(this.song).subscribe(data => {
-      console.log(data)
-    })
+      console.log(data);
+      this.goToSongList()
+    }, error => console.log(error))
+  }
+
+  goToSongList() {
+    this.router.navigate(['/songs'])
   }
 
   onSubmit() {
-    console.log(this.song);
+    this.saveSong();
   }
 }
