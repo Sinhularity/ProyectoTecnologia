@@ -186,20 +186,4 @@ COPY Acceso (
     WITH
     (FORMAT CSV, DELIMITER '|');
 
-/* Cómo insertar datos en la Bytea? */
-/*
- Opción 1.- Utilizar la función pg_read_binary_file  <-- No es recomendable almacenar archivos bytea en la base de datos
-    un INSERT INTO (archivo) normalito con
-    VALUES (pg_read_binary_file('ruta/del/archivo/.mp3||.mp4')
-
-    Opción 2.- Utilizar AWS S3 o Google Cloud Storage para almacenar los archivos y en la base de datos
-    Las dos cuestas dinero. :(
-    Con la otra opción de utilizar Google Drive, se puede hacer un INSERT INTO con la URL del archivo
-    y se puede hacer un SELECT con la URL del archivo
-
-    Opción 3.- Desde el backend se puede hacer un INSERT INTO con un archivo bytea
-    Transformar el archivo a bytea y hacer un INSERT INTO con el archivo bytea
- */
-
-
 \c quit; -- Desconexión de la base de datos
