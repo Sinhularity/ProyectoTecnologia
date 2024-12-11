@@ -1,0 +1,15 @@
+<h2>Canciones</h2>
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Titulo</th>
+            <th>Link de descarga</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor= "let song of songList">
+            <td>{{song.title}}</td>
+            <td><a href={{song.downloadLink}} target="_blank">Download</a></td>
+        </tr>
+    </tbody>
+</table>    
