@@ -4,7 +4,7 @@ SET search_path TO lyrics; -- Cambio de esquema
 
 --- Checar página para el deshaseo
 --- https://docs.vultr.com/how-to-securely-store-passwords-using-postgresql
-
+---  pg_dumpall -U postgres -W -f LyricsBackup.sql
 
 INSERT INTO acceso
     (correo_electronico_acceso
