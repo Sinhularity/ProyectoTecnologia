@@ -1,15 +1,17 @@
 -- Solo la primera vez que se genere la BD
--- DROP DATABASE IF EXISTS lyrics;
 -- WITH (FORCE) -> En caso de que los usuarios estén conectados a la BD
 --
+-- DROP DATABASE IF EXISTS lyrics;
 -- CREATE DATABASE lyrics;
 
 \c lyrics; -- Conexión a la base de datos
-SET search_path TO lyrics; -- Cambio de esquema y para ejecutar consultas
+-- Cambio de esquema y para ejecutar consultas
 
 DROP SCHEMA IF EXISTS lyrics CASCADE;
 
 CREATE SCHEMA lyrics;
+
+SET search_path TO lyrics;
 
 /* >-------------------- Tablas ----------------------------<*/
 
@@ -31,7 +33,7 @@ CREATE TABLE Acceso (
     id_acceso SERIAL NOT NULL
     , correo_electronico_acceso VARCHAR(50) NOT NULL UNIQUE
     , contrasena_acceso TEXT NOT NULL
-    , ultima_fecha_acceso TIMESTAMP NOT NULL DEFAULT NOW()
+    , ultima_fecha_acceso TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'CST')
     , fk_id_usuario INT NOT NULL
     , PRIMARY KEY (id_acceso)
 );
@@ -126,7 +128,7 @@ CREATE FUNCTION add_usuario() RETURNS TRIGGER AS $$
             fecha_log
             , descripcion_log)
         VALUES (
-                NOW()
+                NOW() AT TIME ZONE 'CST'
                , 'Se ha registrado un nuevo usuario: '||NEW.nombre_usuario||'.'
         );
         RETURN NEW;
@@ -141,9 +143,9 @@ CREATE FUNCTION log_acceso() RETURNS TRIGGER AS $$
                         fecha_log
                        , descripcion_log
         ) VALUES (
-                  NOW()
-                  ,CONCAT('Fecha de acceso: ', NEW.ultima_fecha_acceso, 'para el usuario: '
-                      , OLD.correo_electronico_acceso, '.')
+                  NOW() AT TIME ZONE 'CST'
+                  ,CONCAT('Fecha de acceso: ', NEW.ultima_fecha_acceso, ' para el usuario: '
+                      , NEW.correo_electronico_acceso, '.')
                 );
         RETURN NEW;
     END;
@@ -178,54 +180,23 @@ CREATE TRIGGER hash_password BEFORE INSERT OR UPDATE ON Acceso
 
 /* >-------------------- Procedimientos ----------------------------<*/
 
-CREATE PROCEDURE sp_addCancion (
-    IN in_titulo_cancion VARCHAR(50)
-    , IN in_album_cancion VARCHAR(50)
-    , IN in_fecha_publicacion_cancion DATE
-    , IN in_enlace_cancion TEXT
-    , IN in_fk_id_album_cancion INT
-    , IN in_fk_id_genero_musical INT
-) AS $$
-    BEGIN
-        INSERT INTO Cancion (
-            titulo_cancion
-            , album_cancion
-            , fecha_publicacion_cancion
-            , enlace_cancion
-            , fk_id_album_cancion
-            , fk_id_genero_musical
-        ) VALUES (
-            in_titulo_cancion
-            , in_album_cancion
-            , in_fecha_publicacion_cancion
-            , in_enlace_cancion
-            , in_fk_id_album_cancion
-            , in_fk_id_genero_musical
-        );
-    END;
-$$ LANGUAGE plpgsql;
+DROP PROCEDURE IF EXISTS sp_updateLastLogin CASCADE;
 
-CREATE PROCEDURE sp_getSongsByALbum (
-    IN in_album_cancion VARCHAR(50)
-) AS $$
+CREATE PROCEDURE sp_updateLastLogin (IN in_correo_electronico_acceso VARCHAR(50)) AS $$
     BEGIN
-        SELECT
-            c.titulo_cancion
-        FROM
-            cancion c
-        INNER JOIN albumcancion ac
-            on c.id_cancion = ac.id_album_cancion
+        UPDATE acceso
+            SET ultima_fecha_acceso = NOW() AT TIME ZONE 'CST'
         WHERE
-            ac.nombre_album_cancion = in_album_cancion;
+            correo_electronico_acceso = in_correo_electronico_acceso;
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE PROCEDURE sp_getSongsByArtist (
-    IN in_nombre_artista VARCHAR(50)
-) AS $$
+DROP PROCEDURE IF EXISTS sp_getSongsByArtist CASCADE;
+
+CREATE PROCEDURE sp_getSongsByArtist (IN in_nombre_artista VARCHAR(50)) AS $$
     BEGIN
         SELECT
-            c.album_cancion
+            ac.nombre_album_cancion
             , c.titulo_cancion
         FROM
             artista art
@@ -233,30 +204,35 @@ CREATE PROCEDURE sp_getSongsByArtist (
         ON art.id_artista = i.fk_id_artista
         INNER JOIN cancion c
         on i.fk_id_cancion = c.id_cancion
+        INNER JOIN albumcancion ac
+        on c.fk_id_album_cancion = ac.id_album_cancion
         WHERE
             nombre_artista = in_nombre_artista;
     END;
 $$ LANGUAGE plpgsql;
 
-/* >-------------------- Insertar datos ----------------------------<*/
+DROP PROCEDURE IF EXISTS sp_verifyHashPassword CASCADE;
 
-COPY Usuario(
-    apellido_paterno_usuario
-    , apellido_materno_usuario
-    , nombre_usuario
-    , correo_electronico_usuario
-    , telefono_usuario)
-    FROM 'D:\Git Bash\ProyectoTecnologia\Usuario.txt'
-    WITH
-    (FORMAT CSV, DELIMITER '|');
+CREATE PROCEDURE sp_verifyHashPassword (IN in_correo_electronico_acceso VARCHAR(50), IN in_contrasena_acceso TEXT) AS $$
+    DECLARE
+        is_valid BOOLEAN;
+    BEGIN
+        SELECT EXISTS (
+            SELECT
+                1
+            FROM
+            acceso ac
+            WHERE
+            ac.correo_electronico_acceso = in_correo_electronico_acceso
+            AND ac.contrasena_acceso = crypt(in_contrasena_acceso, contrasena_acceso)
+        ) INTO is_valid;
 
-COPY Acceso (
-     correo_electronico_acceso
-    , contrasena_acceso
-    , ultima_fecha_acceso
-    , fk_id_usuario
-    ) FROM 'D:\Git Bash\ProyectoTecnologia\Acceso.txt'
-    WITH
-    (FORMAT CSV, DELIMITER '|');
+        IF is_valid THEN
+            RAISE NOTICE 'Contraseña correcta';
+        ELSE
+            RAISE EXCEPTION 'Contraseña incorrecta';
+        END IF;
+    END;
+$$ LANGUAGE plpgsql;
 
 \c quit; -- Desconexión de la base de datos

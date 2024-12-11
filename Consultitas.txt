@@ -19,3 +19,32 @@ VALUES (
 );
 
 
+INSERT INTO acceso
+    (correo_electronico_acceso
+    , contrasena_acceso
+    , fk_id_usuario)
+VALUES (
+    'zS22017022@estudiantes.uv.mx'
+    , '123456'
+    , (SELECT
+        us.id_usuario
+        FROM usuario us
+        WHERE
+            us.correo_electronico_usuario = 'zS22017022@estudiantes.uv.mx')
+       );
+
+
+
+INSERT INTO usuario (apellido_paterno_usuario, apellido_materno_usuario, nombre_usuario, correo_electronico_usuario, telefono_usuario)
+VALUES ('Sánchez', 'Zamora', 'José', 'zS22017021@estudiantes.uv.mx', '2281234567');
+
+INSERT INTO usuario (apellido_paterno_usuario, apellido_materno_usuario, nombre_usuario, correo_electronico_usuario, telefono_usuario)
+VALUES ('ZZZ', 'Zamora', 'José', 'zS22017022@estudiantes.uv.mx', '3281234567');
+
+SELECT NOW() AT TIME ZONE 'CST';
+
+SET search_path TO lyrics;
+SELECT * FROM Usuario;
+
+
+CALL sp_verifyhashpassword('zS22017022@estudiantes.uv.mx','123456');
