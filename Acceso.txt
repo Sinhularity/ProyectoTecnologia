@@ -1,0 +1,3 @@
+zS22017021@estudiantes.uv.mx|12345|now()|1
+zS22017013@estudiantes.uv.mx|09876|now()|2
+zS22017046@estudiantes.uv.mx|qwerty|now()|3
