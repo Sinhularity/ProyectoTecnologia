@@ -17,6 +17,7 @@
             <td><a href={{song.downloadlink}} target="_blank">URL</a></td>
             <td>
                 <button (click)="updateSong(song.id)" class="btn btn-info">Editar</button>
+                <button (click)="deleteSong(song.id)" class="btn btn-danger" style="margin-left: 10px">Eliminar</button>
             </td>
         </tr>
     </tbody>

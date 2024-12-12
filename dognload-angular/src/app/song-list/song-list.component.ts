@@ -24,6 +24,13 @@ export class SongListComponent implements OnInit {
     this.router.navigate(['/update-song', id]);
   }
 
+  deleteSong(id: number) {
+    this.songService.deleteSong(id).subscribe(data => {
+      console.log(data);
+      this.getSongs();
+    })
+  }
+
   private getSongs() {
     this.songService.getSongList().subscribe(data => {
       this.songList = data;
