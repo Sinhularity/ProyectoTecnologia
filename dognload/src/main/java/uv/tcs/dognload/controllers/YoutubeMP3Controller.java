@@ -30,11 +30,12 @@ public class YoutubeMP3Controller {
 
         YoutubeMP3Response response = youtubeMP3Service.getMP3DownloadLink(songURL).block();
 
-        if (response.getLink().isEmpty()) {
-            return null;
-        } else {
+        if (response.getStatus().equals("ok")) {
             System.out.println(response.getLink());
             return response.getLink();
+        } else if (response.getStatus().equals("processing")) {
+            return response.getStatus();
         }
+        return null;
     }
 }

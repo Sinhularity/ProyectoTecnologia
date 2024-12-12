@@ -30,11 +30,15 @@ export class SongListComponent implements OnInit {
       console.log(data);
 
       if (data) {
-        const link = document.createElement('a');
-        link.href = data;
-        link.click();
+        if (data === "processing") {
+          Swal.fire("Peticion en proceso...", "Espera un momento para descargar");
+        } else {
+          const link = document.createElement('a');
+          link.href = data;
+          link.click();
+        }
       } else {
-        Swal.fire("Peticion en proceso...", "Espera un momento para descargar")
+        Swal.fire("Error durante la descarga", "Revisa el URL de la cancion");
       }
     })
   }
