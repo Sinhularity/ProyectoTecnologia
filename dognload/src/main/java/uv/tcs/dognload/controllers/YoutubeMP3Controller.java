@@ -25,13 +25,15 @@ public class YoutubeMP3Controller {
     public String downloadMP3(@RequestParam Long songID) {
         String songURL = songController.getSongByID(songID).getBody().getVideoURL();
 
-        songURL = songURL.substring(songURL.indexOf('=') + 1).trim();
-        // System.out.println(songURL);
+        // formatear la URL del video para obtener solo el ID
+        String urlID = songURL.substring(songURL.indexOf('=') + 1, songURL.indexOf('=') + 12).trim();
+        // System.out.println(urlID);
 
-        YoutubeMP3Response response = youtubeMP3Service.getMP3DownloadLink(songURL).block();
+        // realizar llamada a la api YoutubeMP3
+        YoutubeMP3Response response = youtubeMP3Service.getMP3DownloadLink(urlID).block();
 
         if (response.getStatus().equals("ok")) {
-            System.out.println(response.getLink());
+            // System.out.println(response.getLink());
             return response.getLink();
         } else if (response.getStatus().equals("processing")) {
             return response.getStatus();
