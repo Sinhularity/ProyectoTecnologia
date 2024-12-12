@@ -1,6 +1,5 @@
 package uv.tcs.dognload.controllers;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,9 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import uv.tcs.dognload.repositories.SongRepo;
-import uv.tcs.dognload.services.YoutubeMP3Service;
 import uv.tcs.dognload.model.Song;
-import uv.tcs.dognload.model.YoutubeMP3Response;
+import uv.tcs.dognload.exceptions.ResourceNotFoundException;;
 
 @RestController
 @RequestMapping("api/v1/")
@@ -28,9 +26,6 @@ import uv.tcs.dognload.model.YoutubeMP3Response;
 public class SongController {
     @Autowired
     private SongRepo repo;
-
-    @Autowired
-    private YoutubeMP3Service youtubeMP3Service;
 
     // listar todas las canciones descargadas
     @GetMapping("/songs")
@@ -42,37 +37,20 @@ public class SongController {
     @PostMapping("/songs")
     public Song saveSong(@RequestBody Song song) {
         System.out.println("cancion guardada");
-
-        try {
-            song.setDownloadlink(getDownloadLink("W9GaIbECisQ"));
-        } catch (Exception e) {
-            System.out.println("Intenta de nuevo...");
-            return new Song();
-        }
         return repo.save(song);
     }
 
-    private String getDownloadLink(String videoID) {
-        YoutubeMP3Response response = youtubeMP3Service.getMP3DownloadLink(videoID).block();
-        System.out.println(response.getStatus());
-        
-        if (response.getStatus().equals("ok")) {
-            System.out.println(response.getLink());
-            return response.getLink();
-        } else {
-            throw new RuntimeException("Error");
-        }
-    }
-
+    // obtener cancion por id
     @GetMapping("songs/{id}")
     public ResponseEntity<Song> getSongByID(@PathVariable Long id) {
-        Song song = repo.findById(id).orElseThrow(() -> new RuntimeException("No encontrado"));
+        Song song = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado"));
         return ResponseEntity.ok(song);
     }
 
+    // actualizar datos de una cancion
     @PutMapping("/songs/{id}")
     public ResponseEntity<Song> updateSong(@PathVariable Long id, @RequestBody Song songDetail) {
-        Song song = repo.findById(id).orElseThrow(() -> new RuntimeException("No encontrado"));
+        Song song = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado"));
         song.setTitle(songDetail.getTitle());
         song.setVideoURL(songDetail.getVideoURL());
 
@@ -80,9 +58,10 @@ public class SongController {
         return ResponseEntity.ok(updatedSong);
     }
 
+    // eliminar cancion
     @DeleteMapping("/songs/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteSong(@PathVariable Long id) {
-        Song song = repo.findById(id).orElseThrow(() -> new RuntimeException("No encontrado"));
+        Song song = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado"));
 
         repo.delete(song);
         Map<String, Boolean> response = new HashMap<>();
