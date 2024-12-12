@@ -30,9 +30,6 @@ public class SongController {
     private SongRepo repo;
 
     @Autowired
-    private YoutubeMP3Controller youtubeMP3Controller;
-
-    @Autowired
     private YoutubeMP3Service youtubeMP3Service;
 
     // listar todas las canciones descargadas

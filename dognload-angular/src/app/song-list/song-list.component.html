@@ -2,22 +2,20 @@
 <table class="table table-striped">
     <thead class="table-dark">
         <tr>  
-            <th>ID</th>  
             <th>Titulo</th>
             <th>URL del video</th>
-            <th>Link de descarga</th>
-            <th>Actions</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor= "let song of songList">
-            <td>{{song.id}}</td>
             <td>{{song.title}}</td>
             <td><a href="{{song.videoURL}}" target="_blank">URL del video</a></td>
-            <td><a href={{song.downloadlink}} target="_blank">URL</a></td>
             <td>
                 <button (click)="updateSong(song.id)" class="btn btn-info">Editar</button>
+                <button (click)="downloadSong(song.id)" class="btn btn-success" style="margin-left: 10px">Descargar</button>
                 <button (click)="deleteSong(song.id)" class="btn btn-danger" style="margin-left: 10px">Eliminar</button>
+                <button (click)="getSongDetail(song.id)" class="btn btn-primary" style="margin-left: 10px">Detalles</button>
             </td>
         </tr>
     </tbody>

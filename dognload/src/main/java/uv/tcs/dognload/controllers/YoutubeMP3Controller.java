@@ -1,23 +1,40 @@
 package uv.tcs.dognload.controllers;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import reactor.core.publisher.Mono;
 import uv.tcs.dognload.model.YoutubeMP3Response;
 import uv.tcs.dognload.services.YoutubeMP3Service;
 
 @RestController
+@RequestMapping("api/v1/songs/")
+@CrossOrigin(origins = "http://localhost:4200/")
 public class YoutubeMP3Controller {
     private final YoutubeMP3Service youtubeMP3Service;
+    private final SongController songController;
 
-    public YoutubeMP3Controller(YoutubeMP3Service youtubeMP3Service) {
+    public YoutubeMP3Controller(YoutubeMP3Service youtubeMP3Service, SongController songController) {
         this.youtubeMP3Service = youtubeMP3Service;
+        this.songController = songController;
     }
 
-    @GetMapping("/download-mp3")
-    public Mono<YoutubeMP3Response> downloadMP3(@RequestParam String videoID) {
-        return youtubeMP3Service.getMP3DownloadLink(videoID);
+    @GetMapping("/download")
+    public String downloadMP3(@RequestParam Long songID) {
+        String songURL = songController.getSongByID(songID).getBody().getVideoURL();
+
+        songURL = songURL.substring(songURL.indexOf('=') + 1).trim();
+        // System.out.println(songURL);
+
+        YoutubeMP3Response response = youtubeMP3Service.getMP3DownloadLink(songURL).block();
+
+        if (response.getLink().isEmpty()) {
+            return null;
+        } else {
+            System.out.println(response.getLink());
+            return response.getLink();
+        }
     }
 }

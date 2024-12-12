@@ -10,11 +10,16 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Cancion")
 public class Song {
+
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "title", length = 65, nullable = false)
     private String title;
+    @Column(name = "videoURL", length = 255, nullable = false)
     private String videoURL;
+    @Column(name = "downloadlink", columnDefinition = "TEXT")
     private String downloadlink;
     
     public long getId() {

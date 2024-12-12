@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SongService } from '../song.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-song-list',
@@ -24,11 +25,29 @@ export class SongListComponent implements OnInit {
     this.router.navigate(['/update-song', id]);
   }
 
+  downloadSong(id: number) {
+    this.songService.downloadSong(id).subscribe(data => {
+      console.log(data);
+
+      if (data) {
+        const link = document.createElement('a');
+        link.href = data;
+        link.click();
+      } else {
+        Swal.fire("Peticion en proceso...", "Espera un momento para descargar")
+      }
+    })
+  }
+
   deleteSong(id: number) {
     this.songService.deleteSong(id).subscribe(data => {
       console.log(data);
       this.getSongs();
     })
+  }
+
+  getSongDetail(id: number) {
+    this.router.navigate(['song-detail', id])
   }
 
   private getSongs() {
