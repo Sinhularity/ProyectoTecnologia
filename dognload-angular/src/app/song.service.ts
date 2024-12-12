@@ -20,4 +20,11 @@ export class SongService {
     return this.httpClient.post(`${this.baseURL}`, song);
   }
 
+  updateSong(id: number, song: Song): Observable<Object> {
+    return this.httpClient.put(`${this.baseURL}/${id}`, song);
+  }
+
+  getSongByID(id: number): Observable<Song> {
+    return this.httpClient.get<Song>(`${this.baseURL}/${id}`);
+  }
 }

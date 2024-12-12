@@ -16,7 +16,7 @@ public class YoutubeMP3Controller {
         this.youtubeMP3Service = youtubeMP3Service;
     }
 
-    @GetMapping("http://localhost:4200/songs")
+    @GetMapping("/download-mp3")
     public Mono<YoutubeMP3Response> downloadMP3(@RequestParam String videoID) {
         return youtubeMP3Service.getMP3DownloadLink(videoID);
     }

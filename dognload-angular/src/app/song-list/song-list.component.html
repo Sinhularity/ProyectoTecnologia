@@ -1,17 +1,23 @@
 <h2>Canciones</h2>
 <table class="table table-striped">
     <thead class="table-dark">
-        <tr>    
+        <tr>  
+            <th>ID</th>  
             <th>Titulo</th>
             <th>URL del video</th>
             <th>Link de descarga</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor= "let song of songList">
+            <td>{{song.id}}</td>
             <td>{{song.title}}</td>
             <td><a href="{{song.videoURL}}" target="_blank">URL del video</a></td>
-            <td><a href={{song.downloadLink}} target="_blank">Download</a></td>
+            <td><a href={{song.downloadlink}} target="_blank">URL</a></td>
+            <td>
+                <button (click)="updateSong(song.id)" class="btn btn-info">Editar</button>
+            </td>
         </tr>
     </tbody>
 </table>    

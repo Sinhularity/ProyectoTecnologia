@@ -1,0 +1,31 @@
+<div class="col-md-6 offset-md-3">
+    <h3 class="text-center">Editar canción</h3>
+    <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label>Titulo:</label>
+            <input type="text"
+            class="form-control"
+            id="title"
+            [(ngModel)]="song.title"
+            name="title"
+            required
+            placeholder="Título de la canción"
+            />
+        </div>
+
+        <div class="form-group">
+            <label>URL del video:</label>
+            <input 
+                type="text"
+                class="form-control"
+                id="url"
+                [(ngModel)]="song.videoURL"
+                name="url"
+                required
+                placeholder="URL"
+            />
+        </div>
+
+        <button class="btn btn-success">Guardar</button>
+    </form>
+</div>

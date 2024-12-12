@@ -26,6 +26,7 @@ public class YoutubeMP3Service {
     }
 
     public Mono<YoutubeMP3Response> getMP3DownloadLink(String videoID) {
+        System.out.println("Ok");
         return webClient.get()
             .uri(apiUrl + videoID)
             .header("x-rapidapi-key", apiKey)

@@ -1,5 +1,6 @@
 export class Song {
+    id:number;
     title: string;
     videoURL:string;
-    downloadLink: string;
+    downloadlink: string;
 }
