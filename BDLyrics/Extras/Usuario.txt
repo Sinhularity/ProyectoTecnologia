@@ -1,3 +1,17 @@
 Frias|García|Kevin Sebastián|zS22017021@estudiantes.uv.mx|9212652693
 Peralta|Carrillo|Caleb|zS22017013@estudiantes.uv.mx|9931701376
 Ventura|Uscanga|José Julián|zS22017046@estudiantes.uv.mx|9213024843
+
+
+INSERT INTO usuario (apellido_paterno_usuario
+, apellido_materno_usuario
+, nombre_usuario
+, correo_electronico_usuario
+, telefono_usuario)
+VALUES (
+'Frias'
+, 'García'
+, 'Kevin Sebastián'
+, 'zS22017021@estudiantes.uv.mx'
+, '9212652693'
+)

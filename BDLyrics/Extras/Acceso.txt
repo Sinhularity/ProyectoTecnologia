@@ -1,3 +1,15 @@
 zS22017021@estudiantes.uv.mx|12345|now()|1
 zS22017013@estudiantes.uv.mx|09876|now()|2
 zS22017046@estudiantes.uv.mx|qwerty|now()|3
+
+
+INSERT INTO acceso (correo_electronico_acceso
+, contrasena_acceso
+, ultima_fecha_acceso
+, fk_id_usuario)
+VALUES (
+'zS22017021@estudiantes.uv.mx'
+, '12345'
+, now()
+, 1
+);
